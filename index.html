@@ -7,7 +7,19 @@
 <title>Happy New Year Surprise</title>
 
 <style>
-*{box-sizing:border-box;font-family:Segoe UI,sans-serif;-webkit-tap-highlight-color:transparent}
+*{
+  box-sizing:border-box;
+  font-family:Segoe UI,sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* 🔒 PREVENT TEXT / EMOJI SELECTION */
+body, .hold, .heart, .card, .gift, .ticket {
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
 body{
   margin:0;height:100vh;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
@@ -137,22 +149,22 @@ canvas{position:absolute;inset:0;pointer-events:none}
   <div class="ticket" id="ticket">
     <div class="inner">
       <div class="face front">
-        <h2>Happy New Year 🎆 2026</h2>
+        <h2>Happy New Year 🎆</h2>
         <div style="font-size:64px">🧸</div>
         <small>(tap to open)</small>
-        <h2>with love ❤️<i class="fa-regular fa-heart"></i></h2>
       </div>
       <div class="face back">
         <h3>For You 💙</h3>
         <p>Wishing you peace, warmth and happiness ✨</p>
-        <p>thanks for staying , still remeber first day when u accept my request, thank you</p>
-        <p>hope in new year , we create new memories 😂</i></p>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+/* 🚫 Disable long-press menu globally */
+document.addEventListener("contextmenu",e=>e.preventDefault());
+
 /* ---------- PAGE SWITCH ---------- */
 function show(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -161,16 +173,19 @@ function show(n){
   document.querySelector('.bg'+n).classList.add('active');
 }
 
-/* ---------- HOLD ---------- */
+/* ---------- HOLD (FIXED FOR MOBILE) ---------- */
 const c=document.querySelector('circle');
 const h=document.getElementById('hold');
 let timer;
-h.addEventListener("pointerdown",()=>{
+
+h.addEventListener("pointerdown",e=>{
+  e.preventDefault();           // ⭐ KEY FIX
   c.style.strokeDashoffset=0;
   timer=setTimeout(()=>show(2),1200);
 });
-["pointerup","pointerleave","pointercancel"].forEach(e=>{
-  h.addEventListener(e,()=>{
+
+["pointerup","pointerleave","pointercancel"].forEach(ev=>{
+  h.addEventListener(ev,()=>{
     clearTimeout(timer);
     c.style.strokeDashoffset=460;
   });
@@ -208,7 +223,6 @@ function burst(x,y){
 function animate(){
   ctx.fillStyle="rgba(0,0,0,0.35)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-
   particles=particles.filter(p=>p.life-- >0);
   particles.forEach(p=>{
     p.x+=p.vx;p.y+=p.vy;p.vy+=0.03;
@@ -217,25 +231,19 @@ function animate(){
     ctx.arc(p.x,p.y,2.2,0,Math.PI*2);
     ctx.fill();
   });
-
-  if(fireworksRunning && Math.random()<0.05){
-    burst(
-      Math.random()*canvas.width,
-      Math.random()*canvas.height*0.5
-    );
-  }
-
+  if(fireworksRunning && Math.random()<0.05)
+    burst(Math.random()*canvas.width,Math.random()*canvas.height*0.5);
   requestAnimationFrame(animate);
 }
 animate();
 
-/* ---------- GIFT TAP → START FIREWORKS ---------- */
+/* ---------- GIFT TAP ---------- */
 gift.addEventListener("pointerdown",()=>{
   fireworksRunning=true;
   show(3);
 });
 
-/* ---------- CARD TAP → STOP FIREWORKS ---------- */
+/* ---------- TICKET TAP ---------- */
 document.getElementById("ticket").addEventListener("pointerdown",function(){
   fireworksRunning=!fireworksRunning;
   this.classList.toggle("open");
@@ -244,6 +252,7 @@ document.getElementById("ticket").addEventListener("pointerdown",function(){
 
 </body>
 </html>
+
 
 
 
